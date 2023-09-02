@@ -63,7 +63,15 @@ class SequenceModel(LightningModule):
         if 'eval' in self.cfg and 'metrics' in self.cfg.eval:
             metrics_cfg = self.cfg.eval.metrics
         else:
-            metrics_cfg = {'acc': {'_target_': 'torchmetrics.Accuracy'}}
+            # metrics_cfg = {'acc': {'_target_': 'torchmetrics.Accuracy'}}
+            metrics_cfg = {
+                'acc': {
+                    '_target_': 'torchmetrics.Accuracy',
+                    'task': 'multiclass',
+                    'num_classes': 1000
+                }
+            }
+
         metrics = MetricCollection({name: hydra.utils.instantiate(cfg)
                                     for name, cfg in metrics_cfg.items()})
         self.train_metrics = metrics.clone(prefix='train/')

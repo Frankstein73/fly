@@ -12,7 +12,7 @@ from pytorch_lightning import (
     Trainer,
     seed_everything,
 )
-from pytorch_lightning.loggers import LightningLoggerBase
+from pytorch_lightning.loggers import Logger
 
 from src.utils import utils
 
@@ -54,12 +54,14 @@ def evaluate(config: DictConfig) -> None:
         cls = hydra.utils.get_class(config.task._target_)
         trained_model = cls.load_from_checkpoint(checkpoint_path=config.eval.ckpt)
     else:
+        print(config)
         trained_model: LightningModule = hydra.utils.instantiate(config.task, cfg=config,
                                                                  _recursive_=False)
         load_return = trained_model.model.load_state_dict(load_checkpoint(config.eval.ckpt,
                                                                           device=trained_model.device),
                                                           strict=False)
         log.info(load_return)
+
 
     # datamodule: LightningDataModule = hydra.utils.instantiate(config.datamodule)
     datamodule: LightningDataModule = trained_model._datamodule
@@ -78,7 +80,7 @@ def evaluate(config: DictConfig) -> None:
                 callbacks.append(hydra.utils.instantiate(cb_conf))
 
     # Init Lightning loggers
-    logger: List[LightningLoggerBase] = []
+    logger: List[Logger] = []
     if "logger" in config:
         for _, lg_conf in config["logger"].items():
             if "_target_" in lg_conf:

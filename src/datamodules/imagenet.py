@@ -61,7 +61,8 @@ class ImagenetDataModule(LightningDataModule):
                         returning them
             drop_last: If true drops the last incomplete batch
         """
-        super().__init__(*args, **kwargs)
+        # super().__init__(*args, **kwargs)
+        super().__init__()
 
         self.image_size = image_size
         self.dims = (3, self.image_size, self.image_size)
@@ -78,6 +79,9 @@ class ImagenetDataModule(LightningDataModule):
         if dali is not None and self.use_archive_dataset:
             raise NotImplementedError('dali is not compatible with archive dataset')
         self.dali = dali
+        # save kwargs
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     @property
     def num_classes(self) -> int:
@@ -111,6 +115,7 @@ class ImagenetDataModule(LightningDataModule):
         """Creates train, val, and test dataset."""
         if self.dali is not None:
             return
+        stage = "test"
         if stage == "fit" or stage is None:
             train_transforms = (self.train_transform() if self.train_transforms is None
                                 else self.train_transforms)

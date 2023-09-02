@@ -61,10 +61,11 @@ class LocalAttention(nn.Module):
             key_padding_mask_lengths = key_padding_mask.lengths
 
         # Permute the dimensions to BHTE instead of BTHE
+        key_padding_mask_lengths = key_padding_mask_lengths.int()
         query = rearrange(query, 'b t h e -> b h t e').contiguous()
         key = rearrange(key, 'b s h e -> b h s e').contiguous()
         value = rearrange(value, 'b s h d -> b h s d').contiguous()
-
+        # print(query.device.type, "\n\n\n\n")
         QK = local_dot_product(
             query,
             key,
