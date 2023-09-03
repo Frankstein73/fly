@@ -86,7 +86,7 @@ class SBLocalAttention(nn.Module):
         attn_fn = linear_attention if not self.causal else causal_linear_attention
         q_prime_k_prime_1 = linear_attention_normalization(q_prime, k_prime, causal=self.causal)
         q_prime_k_prime_v, attn_prime = attn_fn(q_prime, k_prime, value, need_weights=need_weights)
-
+        key_padding_mask_lengths = key_padding_mask_lengths.int()
         QK = softmax_temp * local_dot_product(
             query, key, attn_mask_additive_matrix, key_padding_mask_lengths,
             self.local_context
